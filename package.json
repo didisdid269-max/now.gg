@@ -1,0 +1,12 @@
+{
+  "name": "cloudbrowse-proxy",
+  "version": "1.0.0",
+  "description": "now.gg-style web proxy with embedded browser (zero npm deps required)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudBrowse — Browse Anywhere, Instantly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a href="/" class="logo" data-nav="home">
+        <span class="logo-icon">☁</span>
+        <span class="logo-text">CloudBrowse</span>
+      </a>
+      <nav class="topnav">
+        <button class="nav-btn active" data-tab="home">Home</button>
+        <button class="nav-btn" data-tab="browse">Browser</button>
+        <button class="nav-btn" data-tab="popular">Popular</button>
+      </nav>
+      <div class="topbar-actions">
+        <button id="btn-fullscreen" class="icon-btn" title="Fullscreen" hidden>⛶</button>
+        <button id="btn-new-tab" class="pill-btn">+ New tab</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Home -->
+      <section id="view-home" class="view active">
+        <div class="hero">
+          <div class="hero-glow"></div>
+          <h1>Browse anywhere.<br /><span class="gradient-text">Instantly.</span></h1>
+          <p class="hero-sub">No downloads. No installs. Just type a URL and go — like now.gg, but for the whole web.</p>
+          <form id="search-form" class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input id="url-input" type="text" placeholder="Enter a website (e.g. wikipedia.org)" autocomplete="off" />
+            <button type="submit" class="search-go">Go →</button>
+          </form>
+          <div class="quick-tags">
+            <span>Try:</span>
+            <button class="tag" data-url="https://www.wikipedia.org">Wikipedia</button>
+            <button class="tag" data-url="https://archive.org">Internet Archive</button>
+            <button class="tag" data-url="https://news.ycombinator.com">Hacker News</button>
+            <button class="tag" data-url="https://www.reddit.com">Reddit</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2>Popular destinations</h2>
+          <p>Jump in with one click</p>
+        </div>
+        <div id="cards-grid" class="cards-grid"></div>
+
+        <div class="section-header">
+          <h2>Categories</h2>
+        </div>
+        <div class="categories">
+          <button class="cat-chip active" data-filter="all">All</button>
+          <button class="cat-chip" data-filter="social">Social</button>
+          <button class="cat-chip" data-filter="media">Media</button>
+          <button class="cat-chip" data-filter="tools">Tools</button>
+          <button class="cat-chip" data-filter="news">News</button>
+          <button class="cat-chip" data-filter="learn">Learning</button>
+        </div>
+      </section>
+
+      <!-- Browser -->
+      <section id="view-browse" class="view">
+        <div class="browser-chrome">
+          <div class="tab-strip" id="tab-strip"></div>
+          <form id="browser-url-form" class="browser-bar">
+            <button type="button" id="btn-back" class="icon-btn" title="Back">←</button>
+            <button type="button" id="btn-forward" class="icon-btn" title="Forward">→</button>
+            <button type="button" id="btn-reload" class="icon-btn" title="Reload">↻</button>
+            <input id="browser-url" type="text" placeholder="Search or enter URL" />
+            <button type="submit" class="icon-btn go-btn" title="Go">→</button>
+            <button type="button" id="btn-home-bar" class="icon-btn" title="Home">⌂</button>
+          </form>
+        </div>
+        <div class="browser-frame-wrap">
+          <iframe id="browser-frame" title="Proxied browser" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"></iframe>
+          <div id="browser-loading" class="browser-loading hidden">
+            <div class="loader"></div>
+            <p>Loading…</p>
+          </div>
+          <div id="browser-empty" class="browser-empty">
+            <div class="empty-icon">🌐</div>
+            <h3>Start browsing</h3>
+            <p>Enter a URL above or pick a site from Home</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>CloudBrowse — local web proxy for personal use. Respect site terms &amp; network policies.</p>
+    </footer>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
