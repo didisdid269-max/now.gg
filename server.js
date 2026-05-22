@@ -21,7 +21,24 @@ const MIME = {
 function normalizeUrl(input) {
   let url = (input || "").trim();
   if (!url) return null;
-  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+  // Strip accidental proxy wrapper if pasted from address bar
+  const proxyMatch = url.match(/\/browse\?url=([^&]+)/i);
+  if (proxyMatch) {
+    try {
+      url = decodeURIComponent(proxyMatch[1]);
+    } catch {
+      /* keep original */
+    }
+  }
+
+  if (!/^https?:\/\//i.test(url)) {
+    if (/\s/.test(url)) {
+      return `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+    }
+    url = "https://" + url;
+  }
+
   try {
     const parsed = new URL(url);
     if (!["http:", "https:"].includes(parsed.protocol)) return null;
@@ -189,9 +206,8 @@ function parseQuery(search) {
   const params = {};
   if (!search) return params;
   const q = search.startsWith("?") ? search.slice(1) : search;
-  for (const part of q.split("&")) {
-    const [k, v] = part.split("=").map(decodeURIComponent);
-    if (k) params[k] = v || "";
+  for (const [key, value] of new URLSearchParams(q)) {
+    params[key] = value;
   }
   return params;
 }

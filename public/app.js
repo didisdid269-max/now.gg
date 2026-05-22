@@ -119,16 +119,59 @@ function pushHistory(tab, url) {
   tab.historyIndex = tab.history.length - 1;
 }
 
+function normalizeInput(input) {
+  let url = (input || "").trim();
+  if (!url) return null;
+
+  const proxyMatch = url.match(/\/browse\?url=([^&]+)/i);
+  if (proxyMatch) {
+    try {
+      url = decodeURIComponent(proxyMatch[1]);
+    } catch {
+      /* keep */
+    }
+  }
+
+  if (!/^https?:\/\//i.test(url)) {
+    if (/\s/.test(url)) {
+      return `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+    }
+    url = "https://" + url;
+  }
+
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
 async function resolveUrl(input) {
-  const res = await fetch(`/api/resolve?url=${encodeURIComponent(input)}`);
-  if (!res.ok) throw new Error("Invalid URL");
-  return res.json();
+  const local = normalizeInput(input);
+  if (!local) throw new Error("Invalid URL");
+
+  try {
+    const res = await fetch(`/api/resolve?url=${encodeURIComponent(input.trim())}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.url) return data;
+    }
+  } catch {
+    /* server unreachable — use client-side normalization */
+  }
+
+  return { url: local, proxyUrl: proxyUrl(local) };
 }
 
 async function navigate(input) {
-  let target = input;
+  const trimmed = (input || "").trim();
+  if (!trimmed) return;
+
+  let target;
   try {
-    const data = await resolveUrl(input);
+    const data = await resolveUrl(trimmed);
     target = data.url;
   } catch {
     alert("Please enter a valid URL (e.g. example.com)");
