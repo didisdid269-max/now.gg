@@ -1,10 +1,14 @@
 {
   "rewrites": [
-    { "source": "/browse", "destination": "/api/browse" }
+    { "source": "/browse", "destination": "/api/browse" },
+    { "source": "/browse/", "destination": "/api/browse" }
   ],
   "functions": {
     "api/browse.js": {
-      "maxDuration": 30
+      "maxDuration": 60
+    },
+    "api/resolve.js": {
+      "maxDuration": 10
     }
   }
 }

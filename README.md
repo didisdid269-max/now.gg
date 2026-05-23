@@ -51,6 +51,17 @@ npx vercel --prod
 2. The app loads `/browse?url=...` in an iframe.
 3. The Node server fetches the page, rewrites `href`/`src`/form actions to point back through the proxy, and injects a small script so clicks stay proxied.
 
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|--------|--------|-----|
+| **Guru Meditation / Goofy Deploy 404** | Host has no `/browse` API | Redeploy full repo; keep Output Directory empty on Vercel |
+| **Typing `tiktok` fails** | Was resolving to `https://tiktok` | Fixed — now maps to `www.tiktok.com` (TikTok may still block proxies) |
+| **CrazyGames loads forever** | Games need fetch proxy + full page | Auto-opens full page; redeploy latest code |
+| **White screen (e.g. base44.app)** | SPA assets bypassed proxy | Redeploy — inject script now proxies `fetch` / XHR |
+
+**Hard limits:** TikTok, Netflix, and some apps block all web proxies. WebSockets (multiplayer games) may not work on serverless hosts.
+
 ## Notes
 
 - Run locally for personal/testing use.

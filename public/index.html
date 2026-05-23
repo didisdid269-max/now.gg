@@ -78,10 +78,12 @@
             <input id="browser-url" type="text" placeholder="Search or enter URL" />
             <button type="submit" class="icon-btn go-btn" title="Go">→</button>
             <button type="button" id="btn-home-bar" class="icon-btn" title="Home">⌂</button>
+            <button type="button" id="btn-popout" class="pill-btn pill-btn-sm" title="Open full page (better for games)">↗ Full page</button>
           </form>
         </div>
+        <div id="proxy-error" class="proxy-error hidden"></div>
         <div class="browser-frame-wrap">
-          <iframe id="browser-frame" title="Proxied browser" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"></iframe>
+          <iframe id="browser-frame" title="Proxied browser" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-pointer-lock allow-fullscreen allow-popups-to-escape-sandbox"></iframe>
           <div id="browser-loading" class="browser-loading hidden">
             <div class="loader"></div>
             <p>Loading…</p>

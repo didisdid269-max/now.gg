@@ -1,3 +1,18 @@
+const SHORTCUTS = {
+  tiktok: "https://www.tiktok.com",
+  crazygames: "https://www.crazygames.com",
+  "crazygames.gg": "https://www.crazygames.com",
+  youtube: "https://www.youtube.com",
+  google: "https://www.google.com",
+  discord: "https://discord.com/app",
+  twitter: "https://x.com",
+  instagram: "https://www.instagram.com",
+  reddit: "https://www.reddit.com",
+};
+
+const GAME_HOSTS =
+  /crazygames|poki\.com|kongregate|itch\.io|miniclip|armorgames|now\.gg|gamepix/i;
+
 const SITES = [
   { name: "Wikipedia", url: "https://www.wikipedia.org", icon: "📚", cat: "learn" },
   { name: "YouTube", url: "https://www.youtube.com", icon: "▶️", cat: "media" },
@@ -17,6 +32,7 @@ const SITES = [
   { name: "Netflix", url: "https://www.netflix.com", icon: "🎬", cat: "media" },
   { name: "Instagram", url: "https://www.instagram.com", icon: "📷", cat: "social" },
   { name: "TikTok", url: "https://www.tiktok.com", icon: "🎵", cat: "media" },
+  { name: "CrazyGames", url: "https://www.crazygames.com", icon: "🎮", cat: "media" },
   { name: "Pinterest", url: "https://www.pinterest.com", icon: "📌", cat: "social" },
   { name: "LinkedIn", url: "https://www.linkedin.com", icon: "💼", cat: "social" },
   { name: "CNN", url: "https://www.cnn.com", icon: "📺", cat: "news" },
@@ -119,6 +135,16 @@ function pushHistory(tab, url) {
   tab.historyIndex = tab.history.length - 1;
 }
 
+function applyShortcut(input) {
+  const key = input
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "");
+  return SHORTCUTS[key] || null;
+}
+
 function normalizeInput(input) {
   let url = (input || "").trim();
   if (!url) return null;
@@ -132,11 +158,18 @@ function normalizeInput(input) {
     }
   }
 
+  const shortcut = applyShortcut(url);
+  if (shortcut) return shortcut;
+
   if (!/^https?:\/\//i.test(url)) {
     if (/\s/.test(url)) {
       return `https://www.google.com/search?q=${encodeURIComponent(url)}`;
     }
-    url = "https://" + url;
+    if (!url.includes(".")) {
+      url = `https://www.${url}.com`;
+    } else {
+      url = `https://${url}`;
+    }
   }
 
   try {
@@ -146,6 +179,50 @@ function normalizeInput(input) {
   } catch {
     return null;
   }
+}
+
+function isGameSite(url) {
+  try {
+    return GAME_HOSTS.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function showProxyError(msg) {
+  const el = $("#proxy-error");
+  el.textContent = msg;
+  el.classList.remove("hidden");
+}
+
+function hideProxyError() {
+  $("#proxy-error").classList.add("hidden");
+}
+
+function checkFrameError(frame) {
+  try {
+    const text = frame.contentDocument?.body?.innerText || "";
+    if (
+      /Guru Meditation|Goofy Deploy|NOT_FOUND|404: NOT_FOUND|Deploy Page Server/i.test(
+        text
+      )
+    ) {
+      showProxyError(
+        "Proxy route missing on your host (404). Redeploy the full project with api/browse.js and vercel.json rewrites. Or click Full page / run locally with node server.js."
+      );
+      return true;
+    }
+    if (text.length < 20 && frame.contentDocument?.body?.children.length === 0) {
+      showProxyError(
+        "Page loaded blank — this site may block proxies or need Full page mode. Try ↗ Full page or a simpler site first."
+      );
+      return true;
+    }
+  } catch {
+    /* cross-origin — ignore */
+  }
+  hideProxyError();
+  return false;
 }
 
 async function resolveUrl(input) {
@@ -165,7 +242,11 @@ async function resolveUrl(input) {
   return { url: local, proxyUrl: proxyUrl(local) };
 }
 
-async function navigate(input) {
+function openFullPage(target) {
+  window.location.href = proxyUrl(target);
+}
+
+async function navigate(input, opts = {}) {
   const trimmed = (input || "").trim();
   if (!trimmed) return;
 
@@ -174,7 +255,14 @@ async function navigate(input) {
     const data = await resolveUrl(trimmed);
     target = data.url;
   } catch {
-    alert("Please enter a valid URL (e.g. example.com)");
+    alert("Please enter a valid URL (e.g. example.com or tiktok)");
+    return;
+  }
+
+  hideProxyError();
+
+  if (opts.fullPage || isGameSite(target)) {
+    openFullPage(target);
     return;
   }
 
@@ -195,10 +283,13 @@ async function navigate(input) {
   loading.classList.remove("hidden");
   frame.classList.remove("hidden");
 
-  frame.onload = () => loading.classList.add("hidden");
+  frame.onload = () => {
+    loading.classList.add("hidden");
+    checkFrameError(frame);
+  };
   frame.onerror = () => {
     loading.classList.add("hidden");
-    alert("Failed to load page");
+    showProxyError("Failed to load page. Try ↗ Full page or check that /browse is deployed.");
   };
   frame.src = proxyUrl(target);
 }
@@ -328,6 +419,15 @@ function init() {
   });
 
   $("#btn-home-bar").addEventListener("click", () => showView("home"));
+
+  $("#btn-popout").addEventListener("click", () => {
+    const tab = getActiveTab();
+    if (tab.url) openFullPage(tab.url);
+    else {
+      const val = $("#browser-url").value.trim();
+      if (val) navigate(val, { fullPage: true });
+    }
+  });
 
   $("#btn-fullscreen").addEventListener("click", () => {
     const wrap = document.querySelector(".browser-frame-wrap");

@@ -495,6 +495,27 @@ main {
   border-color: rgba(124, 58, 237, 0.5);
 }
 
+.pill-btn-sm {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+}
+
+.proxy-error {
+  margin: 0.5rem 1rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.proxy-error.hidden {
+  display: none;
+}
+
 .go-btn {
   background: var(--gradient) !important;
   border: none !important;
