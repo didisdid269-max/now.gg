@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/browse", "destination": "/api/browse" }
+  ],
+  "functions": {
+    "api/browse.js": {
+      "maxDuration": 30
+    }
+  }
+}

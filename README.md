@@ -27,6 +27,24 @@ npm start
 
 Open **http://localhost:3000**
 
+## Deploy to Vercel
+
+The proxy **must** run as serverless functions — deploying only the `public/` folder causes `404: NOT_FOUND` on `/browse`.
+
+1. Push the **whole project** (root must include `api/`, `lib/`, `public/`, `vercel.json`).
+2. Import the repo in [Vercel](https://vercel.com).
+3. Leave **Output Directory** empty (default). Do not set it to `public`.
+4. Deploy. Routes:
+   - `/` — static UI from `public/`
+   - `/api/resolve` — URL resolver
+   - `/browse` — proxied pages (rewritten to `/api/browse`)
+
+Or use the CLI from the project root:
+
+```bash
+npx vercel --prod
+```
+
 ## How it works
 
 1. You enter a URL on the home page or browser bar.
@@ -42,10 +60,15 @@ Open **http://localhost:3000**
 ## Project structure
 
 ```
-├── server.js          # Proxy + API
+├── server.js          # Local dev server
+├── lib/proxy.js       # Shared proxy logic
+├── api/
+│   ├── browse.js      # Vercel: /browse
+│   └── resolve.js     # Vercel: /api/resolve
 ├── public/
 │   ├── index.html
 │   ├── styles.css
 │   └── app.js
+├── vercel.json
 └── package.json
 ```
